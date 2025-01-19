@@ -8,29 +8,49 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - name: obter codigo do projeto
+      - name: Obter o código do projeto
         uses: actions/checkout@v4
-        
+      
+    
       - name: Autenticar no Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
-      - name: Contrução da Imagem Docker
-        run: echo "Executando o comando docker build"
-      - name: Envio da Imagem Docker
-        run: echo "Executando o comando Docker push"
+         username:  ${{ secrets.DOCKERHUB_USERNAME }}
+         password:  ${{ secrets.DOCKERHUB_TOKEN }}
+     
+      -
+       name: Construção da imagem Docker
+       uses: docker/build-push-action@v6
+       with:
+         context: ./src
+         push: true
+         file: ./src/Dockerfile
+         tags: |
+            guilhermetesch/fake-shop:latest
+            guilhermetesch/fake-shop:v${{ github.run_number }}          
   cd:
     runs-on: ubuntu-latest
     needs: [ci]
+    permissions:
+     id-token: write
+     contents: read
+     actions: read
+
     steps:
-      - name: Autenticar na AWS
-        run: echo "Executando o comando aws configure"
-      - name: Configurar o kubectl
-        run: echo "Executando o comando aws eks update-kubeconfig"
+      - name: Obter o código do projeto
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
       - name: Deploy dos manifestos no kubernetes
-        run: echo "executando o comando kubectl apply"
-
-
-    
+        uses: Azure/k8s-deploy@v5
+        with:
+         manifests: |
+           k8s/deployment.yaml
+         images: |
+          guilhermetesch/fake-shop:v${{ github.run_number }}
