@@ -2,7 +2,7 @@ name: CI-CD
 
 on:
   push:
-    branches: ["main']
+    branches: ["main"]
   workflow_dispatch:
 jobs:
   ci:
@@ -12,7 +12,7 @@ jobs:
         run: echo "Executando o comando Docker Login"
       - name: Contrução da Imagem Docker
         run: echo "Executando o comando docker build"
-      -name: Envio da Imagem Docker
+      - name: Envio da Imagem Docker
         run: echo "Executando o comando Docker push"
   cd:
     runs-on: ubuntu-latest
