@@ -53,4 +53,5 @@ jobs:
          manifests: |
            k8s/deployment.yaml
          images: |
-          guilhermetesch/fake-shop:v${{ github.run_number }}
+          rfdcosta/fake-shop:v${{ github.run_number }}
+
