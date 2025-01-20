@@ -54,4 +54,3 @@ jobs:
            k8s/deployment.yaml
          images: |
           rfdcosta/fake-shop:v${{ github.run_number }}
-
